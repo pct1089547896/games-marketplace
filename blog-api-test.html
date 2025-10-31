@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .info { background-color: #cce7f0; border-color: #b3d4fc; color: #004085; }
+        .log { background-color: #f8f9fa; padding: 10px; border: 1px solid #dee2e6; margin: 10px 0; font-family: monospace; white-space: pre-wrap; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Blog API Connection Test</h1>
+    
+    <div class="test-section">
+        <h3>Test Results</h3>
+        <div id="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Available Blog Posts</h3>
+        <button onclick="fetchAllPosts()">Fetch All Published Posts</button>
+        <button onclick="fetchSpecificPost()">Test Specific Post (aabf993b-46a3-4e0d-85d9-e0cdbb7d424c)</button>
+        <div id="blog-results" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Console Logs</h3>
+        <div id="console-logs" class="log"></div>
+    </div>
+
+    <script type="module">
+        const SUPABASE_URL = 'https://dieqhiezcpexkivklxcw.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpZXFoaWV6Y3BleGtpdmtseGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3MDQ0ODIsImV4cCI6MjA3NzI4MDQ4Mn0.ZPl_HnCEmr9tPDhCOZ_Ks7zyjHIZLEu3cDFsEQYPYbo';
+
+        // Simple log function
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}`;
+            console.log(logMessage);
+            
+            const resultsDiv = document.getElementById('results');
+            const logDiv = document.getElementById('console-logs');
+            
+            // Add to console logs
+            logDiv.textContent += logMessage + '\n';
+            logDiv.scrollTop = logDiv.scrollHeight;
+            
+            // Add styled result
+            const logEntry = document.createElement('div');
+            logEntry.className = `test-section ${type}`;
+            logEntry.textContent = logMessage;
+            resultsDiv.appendChild(logEntry);
+        }
+
+        // Test Supabase connection using fetch
+        async function testSupabaseConnection() {
+            log('🔍 Testing Supabase connection...', 'info');
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/blog_posts?select=count&is_published=eq.true&limit=1`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    log('✅ Supabase connection successful', 'success');
+                    const data = await response.text();
+                    log(`📊 Response: ${data}`, 'info');
+                    return true;
+                } else {
+                    log(`❌ HTTP Error: ${response.status} ${response.statusText}`, 'error');
+                    const errorText = await response.text();
+                    log(`❌ Error details: ${errorText}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                log(`❌ Connection failed: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        // Fetch all published blog posts
+        async function fetchAllPosts() {
+            log('📚 Fetching all published blog posts...', 'info');
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/blog_posts?select=id,title,author,created_at&is_published=eq.true&order=created_at.desc`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const posts = await response.json();
+                    log(`✅ Found ${posts.length} published blog posts`, 'success');
+                    
+                    const blogResults = document.getElementById('blog-results');
+                    blogResults.textContent = posts.map(post => 
+                        `ID: ${post.id}\nTitle: ${post.title}\nAuthor: ${post.author}\nDate: ${new Date(post.created_at).toLocaleDateString()}\n---`
+                    ).join('\n');
+                    
+                    return posts;
+                } else {
+                    log(`❌ Failed to fetch posts: ${response.status}`, 'error');
+                    return null;
+                }
+            } catch (error) {
+                log(`❌ Error fetching posts: ${error.message}`, 'error');
+                return null;
+            }
+        }
+
+        // Fetch specific blog post
+        async function fetchSpecificPost() {
+            const postId = 'aabf993b-46a3-4e0d-85d9-e0cdbb7d424c';
+            log(`🔍 Fetching specific blog post: ${postId}`, 'info');
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/blog_posts?select=*&id=eq.${postId}&is_published=eq.true`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const posts = await response.json();
+                    if (posts.length > 0) {
+                        const post = posts[0];
+                        log(`✅ Found blog post: "${post.title}" by ${post.author}`, 'success');
+                        
+                        const blogResults = document.getElementById('blog-results');
+                        blogResults.textContent = `ID: ${post.id}\nTitle: ${post.title}\nAuthor: ${post.author}\nDate: ${new Date(post.created_at).toLocaleDateString()}\nContent: ${post.content.substring(0, 200)}...`;
+                        
+                        return post;
+                    } else {
+                        log(`❌ Blog post not found or not published`, 'error');
+                        return null;
+                    }
+                } else {
+                    log(`❌ Failed to fetch specific post: ${response.status}`, 'error');
+                    return null;
+                }
+            } catch (error) {
+                log(`❌ Error fetching specific post: ${error.message}`, 'error');
+                return null;
+            }
+        }
+
+        // Auto-run connection test on load
+        window.addEventListener('load', async () => {
+            log('🚀 Starting Blog API Tests...', 'info');
+            await testSupabaseConnection();
+            await fetchAllPosts();
+        });
+
+        // Export functions for button clicks
+        window.fetchAllPosts = fetchAllPosts;
+        window.fetchSpecificPost = fetchSpecificPost;
+    </script>
+</body>
+</html>
