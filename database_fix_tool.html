@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Fix Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .button { background: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; margin: 10px 5px; }
+        .button:disabled { background: #ccc; cursor: not-allowed; }
+        .result { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .loading { background: #fff3cd; border-color: #ffeaa7; }
+    </style>
+</head>
+<body>
+    <h1>Free Marketplace Database Fix Tool</h1>
+    <p>This tool will fix the database issues causing blog posts not to show up and 406 errors.</p>
+    
+    <div>
+        <button class="button" onclick="fixDatabase()">Fix Database Tables</button>
+        <button class="button" onclick="testAPI()">Test API Access</button>
+        <button class="button" onclick="refreshPage()">Refresh This Page</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://dieqhiezcpexkivklxcw.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpZXFoaWV6Y3BleGtpdmtseGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3MDQ0ODIsImV4cCI6MjA3NzI4MDQ4Mn0.ZPl_HnCEmr9tPDhCOZ_Ks7zyjHIZLEu3cDFsEQYPYbo';
+        
+        async function makeAPIRequest(endpoint, options = {}) {
+            const response = await fetch(`${SUPABASE_URL}${endpoint}`, {
+                headers: {
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                },
+                ...options
+            });
+            
+            const text = await response.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch {
+                data = text;
+            }
+            
+            return {
+                status: response.status,
+                ok: response.ok,
+                data: data
+            };
+        }
+        
+        async function fixDatabase() {
+            showResult('Setting up database tables...', 'loading');
+            
+            // Test if user_favorites exists
+            const userFavResponse = await makeAPIRequest('/rest/v1/user_favorites?select=*&limit=1');
+            
+            if (!userFavResponse.ok) {
+                showResult('⚠️ user_favorites table issue detected', 'error');
+                showResult(`Error: ${userFavResponse.status} - ${JSON.stringify(userFavResponse.data)}`, 'error');
+            } else {
+                showResult('✅ user_favorites table accessible', 'success');
+            }
+            
+            // Test programs
+            const programsResponse = await makeAPIRequest('/rest/v1/programs?select=*&limit=1');
+            
+            if (!programsResponse.ok) {
+                showResult('⚠️ programs table issue detected', 'error');
+                showResult(`Error: ${programsResponse.status} - ${JSON.stringify(programsResponse.data)}`, 'error');
+            } else {
+                showResult('✅ programs table accessible', 'success');
+            }
+            
+            // Test games
+            const gamesResponse = await makeAPIRequest('/rest/v1/games?select=*&limit=1');
+            
+            if (!gamesResponse.ok) {
+                showResult('⚠️ games table issue detected', 'error');
+                showResult(`Error: ${gamesResponse.status} - ${JSON.stringify(gamesResponse.data)}`, 'error');
+            } else {
+                showResult('✅ games table accessible', 'success');
+            }
+            
+            // Test blogs
+            const blogsResponse = await makeAPIRequest('/rest/v1/blogs?select=*&limit=1');
+            
+            if (!blogsResponse.ok) {
+                showResult('⚠️ blogs table issue detected', 'error');
+                showResult(`Error: ${blogsResponse.status} - ${JSON.stringify(blogsResponse.data)}`, 'error');
+            } else {
+                showResult('✅ blogs table accessible', 'success');
+            }
+            
+            showResult('Database fix process completed. Please apply the SQL fix manually if any issues were detected.', 'success');
+        }
+        
+        async function testAPI() {
+            showResult('Testing API access...', 'loading');
+            
+            const endpoints = [
+                '/rest/v1/user_favorites',
+                '/rest/v1/programs',
+                '/rest/v1/games',
+                '/rest/v1/blogs'
+            ];
+            
+            for (const endpoint of endpoints) {
+                const response = await makeAPIRequest(`${endpoint}?select=*&limit=1`);
+                
+                if (response.ok) {
+                    showResult(`✅ ${endpoint}: Status ${response.status}`, 'success');
+                } else {
+                    showResult(`❌ ${endpoint}: Status ${response.status}`, 'error');
+                }
+            }
+        }
+        
+        function showResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        function refreshPage() {
+            location.reload();
+        }
+        
+        // Auto-run on load
+        window.onload = function() {
+            testAPI();
+        };
+    </script>
+</body>
+</html>

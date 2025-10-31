@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery System Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #2196F3;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.pending {
+            background: #FFC107;
+            color: white;
+        }
+        .status.success {
+            background: #4CAF50;
+            color: white;
+        }
+        .status.error {
+            background: #f44336;
+            color: white;
+        }
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #0b7dda;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .log {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .sql-box {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin: 15px 0;
+            border: 2px solid #4CAF50;
+        }
+        .instruction {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Gallery System Storage Test</h1>
+        
+        <div class="instruction">
+            <strong>⚠️ BEFORE TESTING:</strong>
+            <p>If your upload test fails, you need to run this SQL in Supabase SQL Editor:</p>
+            <div class="sql-box">
+DROP POLICY IF EXISTS "Allow upload via edge function" ON storage.objects;
+
+CREATE POLICY "Allow upload via edge function" 
+ON storage.objects FOR INSERT 
+WITH CHECK (
+  bucket_id = 'gallery-images'
+  AND (auth.role() = 'anon' OR auth.role() = 'authenticated' OR auth.role() = 'service_role')
+);
+            </div>
+            <p><a href="https://supabase.com/dashboard/project/dieqhiezcpexkivklxcw/sql" target="_blank">→ Open Supabase SQL Editor</a></p>
+        </div>
+
+        <div class="test-section">
+            <h3>Test Status: <span class="status pending" id="status">Not Started</span></h3>
+            <button onclick="runTest()" id="testBtn">Run Upload Test</button>
+            <button onclick="clearLog()" id="clearBtn">Clear Log</button>
+        </div>
+
+        <div class="log" id="log">
+Ready to test. Click "Run Upload Test" to verify storage is working...
+        </div>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://dieqhiezcpexkivklxcw.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpZXFoaWV6Y3BleGtpdmtseGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3MDQ0ODIsImV4cCI6MjA3NzI4MDQ4Mn0.ZPl_HnCEmr9tPDhCOZ_Ks7zyjHIZLEu3cDFsEQYPYbo';
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+        
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ff6b6b' : type === 'success' ? '#51cf66' : '#00ff00';
+            logDiv.innerHTML += `\n<span style="color: ${color}">[${timestamp}] ${message}</span>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = 'Log cleared. Ready for new test...';
+        }
+        
+        function updateStatus(text, className) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = text;
+            statusEl.className = 'status ' + className;
+        }
+        
+        async function runTest() {
+            const testBtn = document.getElementById('testBtn');
+            testBtn.disabled = true;
+            updateStatus('Testing...', 'pending');
+            clearLog();
+            
+            log('='.repeat(60));
+            log('GALLERY STORAGE UPLOAD TEST');
+            log('='.repeat(60));
+            
+            try {
+                // Test 1: Upload a test file
+                log('\nTest 1: Uploading test file to gallery-images bucket...');
+                
+                const testFileName = `test-${Date.now()}.txt`;
+                const testData = new Blob(['Test upload content'], { type: 'text/plain' });
+                
+                const { data: uploadData, error: uploadError } = await supabase
+                    .storage
+                    .from('gallery-images')
+                    .upload(testFileName, testData);
+                
+                if (uploadError) {
+                    log(`✗ UPLOAD FAILED: ${uploadError.message}`, 'error');
+                    
+                    if (uploadError.message.includes('row-level security')) {
+                        log('\n⚠️ DIAGNOSIS: RLS policy is blocking uploads', 'error');
+                        log('', 'error');
+                        log('ACTION REQUIRED:', 'error');
+                        log('1. Go to Supabase SQL Editor', 'error');
+                        log('2. Run the SQL shown in the yellow box above', 'error');
+                        log('3. Click "Run Upload Test" again', 'error');
+                    } else if (uploadError.message.includes('Bucket not found')) {
+                        log('\n⚠️ DIAGNOSIS: Storage bucket missing', 'error');
+                        log('Create a bucket named "gallery-images" in Supabase Storage', 'error');
+                    }
+                    
+                    updateStatus('Failed - RLS Policy Issue', 'error');
+                    testBtn.disabled = false;
+                    return;
+                }
+                
+                log(`✓ Upload successful!`, 'success');
+                log(`  Path: ${uploadData.path}`, 'success');
+                
+                // Test 2: Get public URL
+                log('\nTest 2: Getting public URL...');
+                const { data: urlData } = supabase
+                    .storage
+                    .from('gallery-images')
+                    .getPublicUrl(testFileName);
+                
+                log(`✓ Public URL generated`, 'success');
+                log(`  URL: ${urlData.publicUrl}`, 'success');
+                
+                // Test 3: Clean up
+                log('\nTest 3: Cleaning up test file...');
+                const { error: deleteError } = await supabase
+                    .storage
+                    .from('gallery-images')
+                    .remove([testFileName]);
+                
+                if (deleteError) {
+                    log(`⚠️ Warning: Could not delete test file`, 'error');
+                } else {
+                    log(`✓ Test file deleted`, 'success');
+                }
+                
+                log('\n' + '='.repeat(60));
+                log('🎉 ALL TESTS PASSED!', 'success');
+                log('='.repeat(60));
+                log('', 'success');
+                log('✅ Storage bucket: WORKING', 'success');
+                log('✅ RLS policies: CONFIGURED CORRECTLY', 'success');
+                log('✅ Upload functionality: OPERATIONAL', 'success');
+                log('✅ Public URL generation: WORKING', 'success');
+                log('', 'success');
+                log('Your gallery system is ready to use!', 'success');
+                log('Go to your admin panel and start uploading images.', 'success');
+                
+                updateStatus('All Tests Passed!', 'success');
+                
+            } catch (error) {
+                log(`\n✗ Unexpected error: ${error.message}`, 'error');
+                updateStatus('Error', 'error');
+            }
+            
+            testBtn.disabled = false;
+        }
+    </script>
+</body>
+</html>

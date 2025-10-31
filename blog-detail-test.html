@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blog Detail Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Blog Detail Page Test</h1>
+    <div id="test-results"></div>
+    <h2>Test Links</h2>
+    <ul id="blog-links"></ul>
+
+    <script>
+        const { createClient } = supabase;
+        const supabaseUrl = 'https://dieqhiezcpexkivklxcw.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpZXFoaWV6Y3BleGtpdmtseGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3MDQ0ODIsImV4cCI6MjA3NzI4MDQ4Mn0.ZPl_HnCEmr9tPDhCOZ_Ks7zyjHIZLEu3cDFsEQYPYbo';
+        
+        const supabaseClient = createClient(supabaseUrl, supabaseKey);
+        
+        async function testBlogDetailPage() {
+            const resultsDiv = document.getElementById('results');
+            const linksDiv = document.getElementById('blog-links');
+            
+            try {
+                // Test fetching blog posts
+                const { data: posts, error } = await supabaseClient
+                    .from('blog_posts')
+                    .select('id, title, author, publish_date')
+                    .eq('is_published', true)
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    resultsDiv.innerHTML = `<p style="color: red;">❌ Error fetching posts: ${error.message}</p>`;
+                    return;
+                }
+                
+                if (posts && posts.length > 0) {
+                    resultsDiv.innerHTML = `<p style="color: green;">✅ Successfully loaded ${posts.length} blog posts</p>`;
+                    
+                    // Generate test links
+                    posts.forEach(post => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <a href="#" onclick="testBlogDetail('${post.id}')" style="text-decoration: underline;">
+                                Test "${post.title}" (ID: ${post.id})
+                            </a>
+                        `;
+                        linksDiv.appendChild(li);
+                    });
+                    
+                    resultsDiv.innerHTML += `<p>✅ Found ${posts.length} published blog posts ready for testing</p>`;
+                } else {
+                    resultsDiv.innerHTML = '<p style="color: orange;">⚠️ No blog posts found</p>';
+                }
+            } catch (err) {
+                resultsDiv.innerHTML = `<p style="color: red;">❌ Exception: ${err.message}</p>`;
+            }
+        }
+        
+        async function testBlogDetail(postId) {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                console.log('Testing blog detail fetch for ID:', postId);
+                
+                const { data: post, error } = await supabaseClient
+                    .from('blog_posts')
+                    .select('*')
+                    .eq('id', postId)
+                    .eq('is_published', true)
+                    .single();
+                
+                if (error) {
+                    resultsDiv.innerHTML = `<p style="color: red;">❌ Error fetching blog detail: ${error.message}</p>`;
+                    return;
+                }
+                
+                if (post) {
+                    resultsDiv.innerHTML = `
+                        <div style="border: 1px solid #ccc; padding: 15px; margin: 10px 0;">
+                            <h3>✅ Blog Detail Test Result</h3>
+                            <p><strong>Title:</strong> ${post.title}</p>
+                            <p><strong>Author:</strong> ${post.author}</p>
+                            <p><strong>Published:</strong> ${new Date(post.publish_date).toLocaleDateString()}</p>
+                            <p><strong>Has Featured Image:</strong> ${post.featured_image ? 'Yes' : 'No'}</p>
+                            <p><strong>Content Length:</strong> ${post.content ? post.content.length : 0} characters</p>
+                            <p><strong>ID:</strong> ${post.id}</p>
+                        </div>
+                        <p style="color: green;">✅ Blog detail API is working correctly!</p>
+                        <p>🚀 Try the "Read more" button on your blog listing page - it should now work!</p>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = '<p style="color: red;">❌ Blog post not found</p>';
+                }
+            } catch (err) {
+                resultsDiv.innerHTML = `<p style="color: red;">❌ Exception: ${err.message}</p>`;
+            }
+        }
+        
+        // Run test when page loads
+        testBlogDetailPage();
+    </script>
+</body>
+</html>

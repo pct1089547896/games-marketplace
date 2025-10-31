@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blog Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Blog Posts Test</h1>
+    <div id="results"></div>
+
+    <script>
+        const { createClient } = supabase;
+        const supabaseUrl = 'https://dieqhiezcpexkivklxcw.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpZXFoaWV6Y3BleGtpdmtseGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3MDQ0ODIsImV4cCI6MjA3NzI4MDQ4Mn0.ZPl_HnCEmr9tPDhCOZ_Ks7zyjHIZLEu3cDFsEQYPYbo';
+        
+        const supabaseClient = createClient(supabaseUrl, supabaseKey);
+        
+        async function testBlogAccess() {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                console.log('Testing blog posts access...');
+                const { data, error } = await supabaseClient
+                    .from('blog_posts')
+                    .select('id, title, author, publish_date')
+                    .eq('is_published', true)
+                    .order('publish_date', { ascending: false });
+                
+                if (error) {
+                    console.error('Error:', error);
+                    resultsDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                } else {
+                    console.log('Success:', data);
+                    if (data && data.length > 0) {
+                        resultsDiv.innerHTML = `
+                            <p style="color: green;">✅ Successfully loaded ${data.length} blog posts:</p>
+                            <ul>
+                                ${data.map(post => `<li><strong>${post.title}</strong> by ${post.author}</li>`).join('')}
+                            </ul>
+                        `;
+                    } else {
+                        resultsDiv.innerHTML = '<p style="color: orange;">No blog posts found</p>';
+                    }
+                }
+            } catch (err) {
+                console.error('Exception:', err);
+                resultsDiv.innerHTML = `<p style="color: red;">Exception: ${err.message}</p>`;
+            }
+        }
+        
+        // Test when page loads
+        testBlogAccess();
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+    "topRated": "Top Rated",
+    "noContent": "No content available",
+    "filters": "Filters",
+    "sortBy": "Sort By",
+    "categories": "Categories",
+    "platforms": "Platforms",
+    "tags": "Tags",
+    "rating": "Rating",
+    "downloads": "Downloads",
+    "views": "Views",
+    "version": "Version",
+    "systemRequirements": "System Requirements",
+    "stable": "Stable",
+    "beta": "Beta",
+    "development": "In Development",
+    "verified": "Verified",
+    "newBadge": "New"
+  },
+  "ratings": {
+    "submitReview": "Submit Review",
+    "writeReview": "Write a review",
+    "yourRating": "Your Rating",
+    "reviewText": "Review Text (optional)",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "noReviews": "No reviews yet",
+    "beFirst": "Be the first to review",
+    "helpful": "Helpful",
+    "notHelpful": "Not Helpful",
+    "pendingApproval": "Pending admin approval",
+    "loginToReview": "Login to write a review",
+    "reviewSubmitted": "Review submitted successfully"
+  },
+  "favorites": {
+    "add": "Add to Favorites",
+    "remove": "Remove from Favorites",
+    "myFavorites": "My Favorites",
+    "noFavorites": "No favorites yet",
+    "loginRequired": "Please login to add favorites",
+    "error": "Error managing favorites"
+  }
+}
