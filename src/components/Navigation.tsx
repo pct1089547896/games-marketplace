@@ -1,9 +1,17 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, Globe, User, Settings, LogOut, ChevronDown } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { useAuth } from '../contexts/AuthContext';
-import { NotificationBell } from './NotificationBell';
+import React from "react";
+import { Link } from "react-router-dom";
+import {
+  Menu,
+  X,
+  Globe,
+  User,
+  Settings,
+  LogOut,
+  ChevronDown,
+} from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { useAuth } from "../contexts/AuthContext";
+import { NotificationBell } from "./NotificationBell";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -22,7 +30,7 @@ export default function Navigation() {
       await signOut();
       setShowProfileMenu(false);
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
     }
   };
 
@@ -34,26 +42,41 @@ export default function Navigation() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="text-xl sm:text-2xl font-bold text-black">
-              FreeMarket
+              Brocolongo Marketplace
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4 lg:space-x-6 xl:space-x-8">
-            <Link to="/" className="text-gray-900 hover:text-gray-600 font-medium">
-              {t('nav.home')}
+            <Link
+              to="/"
+              className="text-gray-900 hover:text-gray-600 font-medium"
+            >
+              {t("nav.home")}
             </Link>
-            <Link to="/games" className="text-gray-900 hover:text-gray-600 font-medium">
-              {t('nav.games')}
+            <Link
+              to="/games"
+              className="text-gray-900 hover:text-gray-600 font-medium"
+            >
+              {t("nav.games")}
             </Link>
-            <Link to="/programs" className="text-gray-900 hover:text-gray-600 font-medium">
-              {t('nav.programs')}
+            <Link
+              to="/programs"
+              className="text-gray-900 hover:text-gray-600 font-medium"
+            >
+              {t("nav.programs")}
             </Link>
-            <Link to="/blog" className="text-gray-900 hover:text-gray-600 font-medium">
-              {t('nav.blog')}
+            <Link
+              to="/blog"
+              className="text-gray-900 hover:text-gray-600 font-medium"
+            >
+              {t("nav.blog")}
             </Link>
-            <Link to="/forums" className="text-gray-900 hover:text-gray-600 font-medium">
-              {t('nav.forums')}
+            <Link
+              to="/forums"
+              className="text-gray-900 hover:text-gray-600 font-medium"
+            >
+              {t("nav.forums")}
             </Link>
 
             {/* Profile Dropdown */}
@@ -78,7 +101,7 @@ export default function Navigation() {
                           onClick={() => setShowProfileMenu(false)}
                         >
                           <User size={16} />
-                          {t('nav.viewProfile')}
+                          {t("nav.viewProfile")}
                         </Link>
                         <Link
                           to="/profile/edit"
@@ -86,7 +109,7 @@ export default function Navigation() {
                           onClick={() => setShowProfileMenu(false)}
                         >
                           <Settings size={16} />
-                          {t('nav.editProfile')}
+                          {t("nav.editProfile")}
                         </Link>
                         <hr className="border-gray-200 my-1" />
                         <button
@@ -94,7 +117,7 @@ export default function Navigation() {
                           className="w-full flex items-center gap-2 px-4 py-3 hover:bg-gray-100 text-gray-900 text-left"
                         >
                           <LogOut size={16} />
-                          {t('nav.signOut')}
+                          {t("nav.signOut")}
                         </button>
                       </div>
                     )}
@@ -104,7 +127,7 @@ export default function Navigation() {
                     to="/forums/login"
                     className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 font-medium"
                   >
-                    {t('nav.signIn')}
+                    {t("nav.signIn")}
                   </Link>
                 )}
               </>
@@ -125,14 +148,18 @@ export default function Navigation() {
               {showLangMenu && (
                 <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg">
                   <button
-                    onClick={() => switchLanguage('en')}
-                    className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${currentLang === 'en' ? 'font-bold' : ''}`}
+                    onClick={() => switchLanguage("en")}
+                    className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
+                      currentLang === "en" ? "font-bold" : ""
+                    }`}
                   >
                     English
                   </button>
                   <button
-                    onClick={() => switchLanguage('es')}
-                    className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${currentLang === 'es' ? 'font-bold' : ''}`}
+                    onClick={() => switchLanguage("es")}
+                    className={`w-full text-left px-4 py-2 hover:bg-gray-100 ${
+                      currentLang === "es" ? "font-bold" : ""
+                    }`}
                   >
                     Español
                   </button>
@@ -164,35 +191,35 @@ export default function Navigation() {
               className="block px-3 py-3 text-gray-900 hover:bg-gray-100 rounded-lg font-medium"
               onClick={() => setIsOpen(false)}
             >
-              {t('nav.home')}
+              {t("nav.home")}
             </Link>
             <Link
               to="/games"
               className="block px-3 py-3 text-gray-900 hover:bg-gray-100 rounded-lg font-medium"
               onClick={() => setIsOpen(false)}
             >
-              {t('nav.games')}
+              {t("nav.games")}
             </Link>
             <Link
               to="/programs"
               className="block px-3 py-3 text-gray-900 hover:bg-gray-100 rounded-lg font-medium"
               onClick={() => setIsOpen(false)}
             >
-              {t('nav.programs')}
+              {t("nav.programs")}
             </Link>
             <Link
               to="/blog"
               className="block px-3 py-3 text-gray-900 hover:bg-gray-100 rounded-lg font-medium"
               onClick={() => setIsOpen(false)}
             >
-              {t('nav.blog')}
+              {t("nav.blog")}
             </Link>
             <Link
               to="/forums"
               className="block px-3 py-3 text-gray-900 hover:bg-gray-100 rounded-lg font-medium"
               onClick={() => setIsOpen(false)}
             >
-              {t('nav.forums')}
+              {t("nav.forums")}
             </Link>
 
             {/* Mobile Profile Section */}
@@ -202,21 +229,21 @@ export default function Navigation() {
                   <div className="pt-3 border-t border-gray-200 mt-3">
                     <div className="px-3 py-2 text-gray-600 text-sm font-medium flex items-center gap-2">
                       <User size={16} />
-                      {t('nav.profile')}
+                      {t("nav.profile")}
                     </div>
                     <Link
                       to={`/profile/${user.id}`}
                       className="block px-3 py-3 text-gray-900 hover:bg-gray-100 rounded-lg"
                       onClick={() => setIsOpen(false)}
                     >
-                      {t('nav.viewProfile')}
+                      {t("nav.viewProfile")}
                     </Link>
                     <Link
                       to="/profile/edit"
                       className="block px-3 py-3 text-gray-900 hover:bg-gray-100 rounded-lg"
                       onClick={() => setIsOpen(false)}
                     >
-                      {t('nav.editProfile')}
+                      {t("nav.editProfile")}
                     </Link>
                     <button
                       onClick={() => {
@@ -225,7 +252,7 @@ export default function Navigation() {
                       }}
                       className="w-full text-left block px-3 py-3 text-gray-900 hover:bg-gray-100 rounded-lg"
                     >
-                      {t('nav.signOut')}
+                      {t("nav.signOut")}
                     </button>
                   </div>
                 ) : (
@@ -235,7 +262,7 @@ export default function Navigation() {
                       className="block px-4 py-3 bg-black text-white rounded-lg mx-3 text-center font-medium"
                       onClick={() => setIsOpen(false)}
                     >
-                      {t('nav.signIn')}
+                      {t("nav.signIn")}
                     </Link>
                   </div>
                 )}
@@ -250,19 +277,23 @@ export default function Navigation() {
               </div>
               <button
                 onClick={() => {
-                  switchLanguage('en');
+                  switchLanguage("en");
                   setIsOpen(false);
                 }}
-                className={`w-full text-left px-3 py-3 text-gray-900 hover:bg-gray-100 rounded-lg ${currentLang === 'en' ? 'font-bold bg-gray-50' : ''}`}
+                className={`w-full text-left px-3 py-3 text-gray-900 hover:bg-gray-100 rounded-lg ${
+                  currentLang === "en" ? "font-bold bg-gray-50" : ""
+                }`}
               >
                 English
               </button>
               <button
                 onClick={() => {
-                  switchLanguage('es');
+                  switchLanguage("es");
                   setIsOpen(false);
                 }}
-                className={`w-full text-left px-3 py-3 text-gray-900 hover:bg-gray-100 rounded-lg ${currentLang === 'es' ? 'font-bold bg-gray-50' : ''}`}
+                className={`w-full text-left px-3 py-3 text-gray-900 hover:bg-gray-100 rounded-lg ${
+                  currentLang === "es" ? "font-bold bg-gray-50" : ""
+                }`}
               >
                 Español
               </button>
