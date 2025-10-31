@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Application Test</title>
+    <style>
+        /* Simulated Tailwind Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Theme CSS Variables */
+        :root {
+            --theme-primary: #000000;
+            --theme-primary-hover: #1a1a1a;
+            --theme-secondary: #666666;
+            --theme-background: #ffffff;
+            --theme-background-alt: #f5f5f5;
+            --theme-text: #000000;
+            --theme-text-muted: #666666;
+            --theme-border: #e0e0e0;
+        }
+
+        /* Base styles */
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+        }
+
+        /* Simulated Tailwind utilities */
+        .bg-white { background-color: #ffffff; }
+        .bg-black { background-color: #000000; }
+        .bg-gray-100 { background-color: #f3f4f6; }
+        .text-black { color: #000000; }
+        .text-white { color: #ffffff; }
+        .text-gray-600 { color: #4b5563; }
+        .border-gray-200 { border-color: #e5e7eb; }
+
+        .p-4 { padding: 1rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .rounded { border-radius: 0.25rem; }
+        .border { border-width: 1px; border-style: solid; }
+
+        /* Theme overrides when active */
+        body[data-theme-active="true"] {
+            background-color: var(--theme-background) !important;
+            color: var(--theme-text) !important;
+        }
+
+        body[data-theme-active="true"] .bg-white {
+            background-color: var(--theme-background) !important;
+        }
+
+        body[data-theme-active="true"] .bg-gray-100 {
+            background-color: var(--theme-background-alt) !important;
+        }
+
+        body[data-theme-active="true"] .bg-black {
+            background-color: var(--theme-primary) !important;
+        }
+
+        body[data-theme-active="true"] .text-black {
+            color: var(--theme-text) !important;
+        }
+
+        body[data-theme-active="true"] .text-white {
+            color: var(--theme-background) !important;
+        }
+
+        body[data-theme-active="true"] .text-gray-600 {
+            color: var(--theme-text-muted) !important;
+        }
+
+        body[data-theme-active="true"] .border-gray-200 {
+            border-color: var(--theme-border) !important;
+        }
+
+        .test-section {
+            margin-bottom: 2rem;
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border: 2px solid #000;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .controls button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: none;
+            background: #000;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .controls button:hover {
+            background: #333;
+        }
+
+        .status {
+            font-size: 12px;
+            margin-top: 10px;
+            padding: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h3 style="margin-bottom: 15px; font-size: 16px;">Theme Test Controls</h3>
+        <button onclick="applyGamerRazerTheme()">Apply Gamer Razer Theme</button>
+        <button onclick="applyColorfulPopTheme()">Apply Colorful Pop Theme</button>
+        <button onclick="removeTheme()">Remove Theme (Default)</button>
+        <div class="status" id="status">No theme applied</div>
+    </div>
+
+    <h1 class="mb-4">Theme Application Test Page</h1>
+    
+    <div class="test-section">
+        <h2 class="mb-4">Background Colors</h2>
+        <div class="bg-white p-4 mb-4 border border-gray-200 rounded">
+            <p class="text-black">White background with black text (.bg-white .text-black)</p>
+        </div>
+        <div class="bg-gray-100 p-4 mb-4 rounded">
+            <p class="text-black">Gray background with black text (.bg-gray-100 .text-black)</p>
+        </div>
+        <div class="bg-black p-4 mb-4 rounded">
+            <p class="text-white">Black background with white text (.bg-black .text-white)</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="mb-4">Text Colors</h2>
+        <p class="text-black mb-4">This is black text (.text-black)</p>
+        <p class="text-gray-600 mb-4">This is gray text (.text-gray-600)</p>
+    </div>
+
+    <div class="test-section">
+        <h2 class="mb-4">Borders</h2>
+        <div class="p-4 border border-gray-200 rounded">
+            <p class="text-black">Container with gray border (.border-gray-200)</p>
+        </div>
+    </div>
+
+    <script>
+        function applyTheme(themeName, cssVars) {
+            // Apply CSS variables
+            const root = document.documentElement;
+            Object.entries(cssVars).forEach(([key, value]) => {
+                root.style.setProperty(`--theme-${key}`, value);
+            });
+
+            // Set data attribute
+            document.body.setAttribute('data-theme-active', 'true');
+
+            // Update status
+            document.getElementById('status').innerHTML = `
+                <strong>Active: ${themeName}</strong><br>
+                <small>Primary: ${cssVars.primary}</small><br>
+                <small>Background: ${cssVars.background}</small>
+            `;
+        }
+
+        function applyGamerRazerTheme() {
+            applyTheme('Gamer Razer', {
+                primary: '#00ff00',
+                'primary-hover': '#00cc00',
+                secondary: '#1a1a1a',
+                background: '#0a0a0a',
+                'background-alt': '#1a1a1a',
+                text: '#ffffff',
+                'text-muted': '#a0a0a0',
+                border: '#00ff00'
+            });
+        }
+
+        function applyColorfulPopTheme() {
+            applyTheme('Colorful Pop', {
+                primary: '#ff006e',
+                'primary-hover': '#d9005e',
+                secondary: '#ffbe0b',
+                background: '#ffffff',
+                'background-alt': '#f8f9fa',
+                text: '#000000',
+                'text-muted': '#666666',
+                border: '#e0e0e0'
+            });
+        }
+
+        function removeTheme() {
+            document.body.removeAttribute('data-theme-active');
+            document.getElementById('status').textContent = 'No theme applied';
+        }
+    </script>
+</body>
+</html>
