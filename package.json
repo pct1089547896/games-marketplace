@@ -4,11 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "build:prod": "BUILD_MODE=prod vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
+    "dev": "npx vite",
+    "build": "npx vite build",
+    "build:prod": "BUILD_MODE=prod npx vite build",
+    "lint": "npx eslint .",
+    "preview": "npx vite preview",
     "install-deps": "npm install",
     "clean": "rm -rf node_modules package-lock.json"
   },

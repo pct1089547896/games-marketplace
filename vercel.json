@@ -1,7 +1,8 @@
 {
-  "buildCommand": "npm run build",
+  "framework": null,
+  "buildCommand": "npm install && npx vite build",
   "outputDirectory": "dist",
-  "framework": "vite",
+  "devCommand": "npx vite",
   "installCommand": "npm install",
   "rewrites": [
     {
