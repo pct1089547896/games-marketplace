@@ -1,0 +1,12 @@
+{
+  "framework": "vite",
+  "buildCommand": "pnpm install --prefer-offline && pnpm run build",
+  "outputDirectory": "dist",
+  "installCommand": "pnpm install --prefer-offline",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
